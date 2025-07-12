@@ -1,606 +1,549 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oracolo Notturno - Lettura Tarocchi</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Crimson Text', serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-            color: #e6e6fa;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        .stars {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-        
-        .star {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: #fff;
-            border-radius: 50%;
-            animation: twinkle 4s infinite;
-        }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 1; }
-        }
-        
-        .container {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 50px;
-            padding: 40px 0;
-        }
-        
-        .header h1 {
-            font-family: 'Cinzel', serif;
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: #d4af37;
-            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-        }
-        
-        .header p {
-            font-size: 1.3rem;
-            color: #b8b8d1;
-            font-style: italic;
-            opacity: 0.9;
-        }
-        
-        .question-section {
-            background: rgba(20, 20, 40, 0.8);
-            border: 2px solid #4a4a6a;
-            border-radius: 15px;
-            padding: 40px;
-            margin-bottom: 50px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .question-section h2 {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: #d4af37;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        
-        .question-input {
-            width: 100%;
-            padding: 15px 20px;
-            font-size: 1.1rem;
-            background: rgba(10, 10, 30, 0.7);
-            border: 2px solid #4a4a6a;
-            border-radius: 10px;
-            color: #e6e6fa;
-            font-family: 'Crimson Text', serif;
-            resize: vertical;
-            min-height: 100px;
-            margin-bottom: 25px;
-        }
-        
-        .question-input::placeholder {
-            color: #8888aa;
-            font-style: italic;
-        }
-        
-        .question-input:focus {
-            outline: none;
-            border-color: #d4af37;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
-        }
-        
-        .consult-btn {
-            display: block;
-            width: 250px;
-            margin: 0 auto;
-            padding: 15px 30px;
-            font-size: 1.2rem;
-            font-family: 'Cinzel', serif;
-            font-weight: 600;
-            background: linear-gradient(45deg, #d4af37, #f1c40f);
-            color: #1a1a2e;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .consult-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(212, 175, 55, 0.4);
-        }
-        
-        .consult-btn:active {
-            transform: translateY(0);
-        }
-        
-        .consult-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .reading-section {
-            display: none;
-            margin-top: 50px;
-        }
-        
-        .cards-container {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 50px;
-            flex-wrap: wrap;
-        }
-        
-        .card {
-            width: 120px;
-            height: 210px;
-            background: linear-gradient(145deg, #2c2c54, #40407a);
-            border: 3px solid #d4af37;
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.5s ease;
-            transform-style: preserve-3d;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-        
-        .card-back, .card-front {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 12px;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 10px;
-        }
-        
-        .card-back {
-            background: linear-gradient(145deg, #2c2c54, #40407a);
-            border: 2px solid #d4af37;
-        }
-        
-        .card-front {
-            background: linear-gradient(145deg, #f8f8ff, #e6e6fa);
-            color: #2c2c54;
-            transform: rotateY(180deg);
-            font-size: 0.9rem;
-            font-weight: 600;
-            line-height: 1.3;
-        }
-        
-        .card-back::before {
-            content: "🌙";
-            font-size: 3rem;
-            color: #d4af37;
-        }
-        
-        .card-positions {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .position-label {
-            font-family: 'Cinzel', serif;
-            font-size: 1.1rem;
-            color: #d4af37;
-            text-align: center;
-            width: 120px;
-        }
-        
-        .interpretation {
-            background: rgba(20, 20, 40, 0.8);
-            border: 2px solid #4a4a6a;
-            border-radius: 15px;
-            padding: 40px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            margin-bottom: 30px;
-        }
-        
-        .interpretation h3 {
-            font-family: 'Cinzel', serif;
-            font-size: 2rem;
-            color: #d4af37;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-        
-        .interpretation-text {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: #e6e6fa;
-            text-align: justify;
-            margin-bottom: 25px;
-        }
-        
-        .audio-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 30px;
-        }
-        
-        .audio-btn {
-            padding: 12px 25px;
-            font-size: 1rem;
-            font-family: 'Cinzel', serif;
-            background: linear-gradient(45deg, #6c5ce7, #a29bfe);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .audio-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
-        }
-        
-        .reset-btn {
-            display: block;
-            width: 200px;
-            margin: 30px auto;
-            padding: 12px 25px;
-            font-size: 1rem;
-            font-family: 'Cinzel', serif;
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(231, 76, 60, 0.4);
-        }
-        
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 30px 0;
-        }
-        
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid #4a4a6a;
-            border-top: 3px solid #d4af37;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            font-size: 1.2rem;
-            color: #d4af37;
-            font-style: italic;
-        }
-        
-        @media (max-width: 768px) {
-            .header h1 { font-size: 2.5rem; }
-            .cards-container { gap: 20px; }
-            .card { width: 100px; height: 175px; }
-            .position-label { width: 100px; font-size: 1rem; }
-            .question-section, .interpretation { padding: 25px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lettura dei Tarocchi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    .stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .star {
+      position: absolute;
+      width: 2px;
+      height: 2px;
+      background: white;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: fadeInDown 0.8s ease-out;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      background: linear-gradient(45deg, #ffd700, #ffeb3b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      font-weight: 300;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #ffffff;
+    }
+
+    .question-input {
+      width: 100%;
+      padding: 15px;
+      border: none;
+      border-radius: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      font-size: 1rem;
+      resize: vertical;
+      min-height: 80px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .question-input:focus {
+      outline: none;
+      border-color: #ffd700;
+      box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
+      transform: scale(1.02);
+    }
+
+    .question-input::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .ask-button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(45deg, #ffd700, #ffeb3b);
+      color: #333;
+      border: none;
+      border-radius: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .ask-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+    }
+
+    .ask-button:active {
+      transform: translateY(0);
+    }
+
+    .ask-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .cards-section {
+      display: none;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .cards-title {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .cards-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .tarot-card {
+      width: 80px;
+      height: 120px;
+      background: linear-gradient(45deg, #2a2a2a, #4a4a4a);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+      transform: perspective(1000px) rotateY(0deg);
+      transition: all 0.6s ease;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .tarot-card.flip {
+      transform: perspective(1000px) rotateY(180deg);
+    }
+
+    .response-section {
+      display: none;
+      animation: fadeIn 0.6s ease-out 0.3s both;
+    }
+
+    .response-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #ffffff;
+      text-align: center;
+      font-weight: 300;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 1.1rem;
+      color: #ffd700;
+    }
+
+    .loading::after {
+      content: '';
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 215, 0, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffd700;
+      animation: spin 1s ease-in-out infinite;
+      margin-left: 10px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .history-section {
+      margin-top: 30px;
+    }
+
+    .history-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .history-item {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-left: 4px solid #ffd700;
+      animation: slideInLeft 0.5s ease-out;
+    }
+
+    .history-question {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #ffd700;
+    }
+
+    .history-answer {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+
+    .history-cards {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      font-style: italic;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .tarot-card {
+        width: 70px;
+        height: 100px;
+        font-size: 0.7rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="stars"></div>
-    
-    <div class="container">
-        <div class="header">
-            <h1>Oracolo Notturno</h1>
-            <p>Lascia che le carte rivelino i segreti del tuo destino</p>
-        </div>
-        
-        <div class="question-section">
-            <h2>Poni la tua domanda all'universo</h2>
-            <textarea class="question-input" placeholder="Scrivi qui la tua domanda... L'oracolo ascolterà e risponderà attraverso le carte dei tarocchi."></textarea>
-            <button class="consult-btn" onclick="consultOracle()">Consulta l'Oracolo</button>
-        </div>
-        
-        <div class="loading">
-            <div class="loading-spinner"></div>
-            <div class="loading-text">L'oracolo sta mescolando le carte...</div>
-        </div>
-        
-        <div class="reading-section">
-            <div class="card-positions">
-                <div class="position-label">Passato</div>
-                <div class="position-label">Presente</div>
-                <div class="position-label">Futuro</div>
-            </div>
-            
-            <div class="cards-container">
-                <div class="card" onclick="flipCard(0)">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-0"></div>
-                </div>
-                <div class="card" onclick="flipCard(1)">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-1"></div>
-                </div>
-                <div class="card" onclick="flipCard(2)">
-                    <div class="card-back"></div>
-                    <div class="card-front" id="card-2"></div>
-                </div>
-            </div>
-            
-            <div class="interpretation">
-                <h3>Interpretazione delle Carte</h3>
-                <div class="interpretation-text" id="interpretation-text"></div>
-                <div class="audio-controls">
-                    <button class="audio-btn" onclick="speakInterpretation()">🔊 Ascolta il Responso</button>
-                    <button class="audio-btn" onclick="stopSpeaking()">⏹️ Ferma Audio</button>
-                </div>
-            </div>
-            
-            <button class="reset-btn" onclick="resetReading()">Nuova Lettura</button>
-        </div>
+  <div class="stars"></div>
+  
+  <div class="container">
+    <div class="header">
+      <h1>✨ Tarocchi Mistici ✨</h1>
+      <p>Svela i segreti del tuo futuro</p>
     </div>
 
-    <script>
-        // Deck completo dei tarocchi
-        const tarotDeck = [
-            "Il Matto", "Il Mago", "La Papessa", "L'Imperatrice", "L'Imperatore",
-            "Il Papa", "Gli Amanti", "Il Carro", "La Giustizia", "L'Eremita",
-            "La Ruota della Fortuna", "La Forza", "L'Appeso", "La Morte",
-            "La Temperanza", "Il Diavolo", "La Torre", "Le Stelle", "La Luna",
-            "Il Sole", "Il Giudizio", "Il Mondo", "Asso di Bastoni", "Due di Bastoni",
-            "Tre di Bastoni", "Quattro di Bastoni", "Cinque di Bastoni", "Sei di Bastoni",
-            "Sette di Bastoni", "Otto di Bastoni", "Nove di Bastoni", "Dieci di Bastoni",
-            "Fante di Bastoni", "Cavaliere di Bastoni", "Regina di Bastoni", "Re di Bastoni",
-            "Asso di Coppe", "Due di Coppe", "Tre di Coppe", "Quattro di Coppe",
-            "Cinque di Coppe", "Sei di Coppe", "Sette di Coppe", "Otto di Coppe",
-            "Nove di Coppe", "Dieci di Coppe", "Fante di Coppe", "Cavaliere di Coppe",
-            "Regina di Coppe", "Re di Coppe", "Asso di Spade", "Due di Spade",
-            "Tre di Spade", "Quattro di Spade", "Cinque di Spade", "Sei di Spade",
-            "Sette di Spade", "Otto di Spade", "Nove di Spade", "Dieci di Spade",
-            "Fante di Spade", "Cavaliere di Spade", "Regina di Spade", "Re di Spade",
-            "Asso di Denari", "Due di Denari", "Tre di Denari", "Quattro di Denari",
-            "Cinque di Denari", "Sei di Denari", "Sette di Denari", "Otto di Denari",
-            "Nove di Denari", "Dieci di Denari", "Fante di Denari", "Cavaliere di Denari",
-            "Regina di Denari", "Re di Denari"
-        ];
+    <div class="card">
+      <div class="input-group">
+        <label for="domanda">Poni la tua domanda alle carte:</label>
+        <textarea 
+          id="domanda" 
+          class="question-input" 
+          placeholder="Scrivi qui la tua domanda per i tarocchi..."
+          maxlength="500"
+        ></textarea>
+      </div>
+      
+      <button id="ask-btn" class="ask-button" onclick="chiedi()">
+        🔮 Interroga i Tarocchi
+      </button>
+    </div>
 
-        // Interpretazioni delle carte
-        const interpretations = {
-            "Il Matto": "Nuovi inizi, spontaneità, fiducia nel futuro, avventure inaspettate",
-            "Il Mago": "Manifestazione, risorse, potere, abilità creative e determinazione",
-            "La Papessa": "Intuizione, saggezza interiore, conoscenza nascosta, misteri",
-            "L'Imperatrice": "Fertilità, creatività, abbondanza, natura materna e crescita",
-            "L'Imperatore": "Autorità, struttura, controllo, stabilità e leadership",
-            "Il Papa": "Tradizione, spiritualità, guida, insegnamento e conformità",
-            "Gli Amanti": "Amore, armonia, relazioni, scelte importanti e unione",
-            "Il Carro": "Determinazione, controllo, successo, progresso e volontà",
-            "La Giustizia": "Equilibrio, verità, legge, responsabilità e karma",
-            "L'Eremita": "Introspezione, ricerca interiore, saggezza, guida spirituale",
-            "La Ruota della Fortuna": "Cambiamento, cicli, destino, fortuna e opportunità",
-            "La Forza": "Coraggio, compassione, pazienza, autocontrollo e determinazione",
-            "L'Appeso": "Sospensione, sacrificio, nuova prospettiva, attesa e riflessione",
-            "La Morte": "Trasformazione, fine di un ciclo, rinascita, cambiamento profondo",
-            "La Temperanza": "Equilibrio, moderazione, pazienza, guarigione e armonia",
-            "Il Diavolo": "Tentazione, dipendenza, materialismo, illusioni e limitazioni",
-            "La Torre": "Distruzione improvvisa, rivelazione, liberazione, shock e cambiamento",
-            "Le Stelle": "Speranza, ispirazione, guarigione, guida spirituale e ottimismo",
-            "La Luna": "Illusione, intuizione, sogni, paure inconsce e mistero",
-            "Il Sole": "Gioia, successo, vitalità, chiarezza e positività",
-            "Il Giudizio": "Rinascita, perdono, chiamata superiore, risveglio spirituale",
-            "Il Mondo": "Completamento, realizzazione, successo, ciclo completo e soddisfazione"
-        };
+    <div class="card cards-section" id="cards-section">
+      <div class="cards-title">Le Carte Estratte</div>
+      <div class="cards-container" id="cards-container">
+        <!-- Le carte saranno inserite qui -->
+      </div>
+    </div>
 
-        let currentReading = [];
-        let speechSynthesis = window.speechSynthesis;
-        let currentUtterance = null;
+    <div class="card response-section" id="response-section">
+      <div class="response-text" id="response-text"></div>
+    </div>
 
-        // Genera stelle casuali
-        function generateStars() {
-            const starsContainer = document.querySelector('.stars');
-            for (let i = 0; i < 100; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.animationDelay = Math.random() * 4 + 's';
-                starsContainer.appendChild(star);
-            }
+    <div class="card history-section" id="history-section" style="display: none;">
+      <div class="history-title">📜 Conversazioni Passate</div>
+      <div id="history-container"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "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";
+    const URL = "https://openrouter.ai/api/v1/chat/completions";
+    const storico = [];
+
+    // Crea le stelle di sfondo
+    function createStars() {
+      const starsContainer = document.querySelector('.stars');
+      for (let i = 0; i < 50; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.animationDelay = Math.random() * 2 + 's';
+        starsContainer.appendChild(star);
+      }
+    }
+
+    function showLoading() {
+      const responseSection = document.getElementById('response-section');
+      const responseText = document.getElementById('response-text');
+      
+      responseText.innerHTML = '<div class="loading">I Tarocchi stanno rivelando il tuo destino...</div>';
+      responseSection.style.display = 'block';
+    }
+
+    function hideAllSections() {
+      document.getElementById('cards-section').style.display = 'none';
+      document.getElementById('response-section').style.display = 'none';
+    }
+
+    function showCards(carte) {
+      const cardsSection = document.getElementById('cards-section');
+      const cardsContainer = document.getElementById('cards-container');
+      
+      cardsContainer.innerHTML = '';
+      
+      carte.forEach((carta, index) => {
+        const cardElement = document.createElement('div');
+        cardElement.className = 'tarot-card';
+        cardElement.textContent = carta;
+        
+        setTimeout(() => {
+          cardElement.classList.add('flip');
+        }, index * 200);
+        
+        cardsContainer.appendChild(cardElement);
+      });
+      
+      cardsSection.style.display = 'block';
+    }
+
+    function showResponse(risposta) {
+      const responseText = document.getElementById('response-text');
+      responseText.textContent = risposta;
+    }
+
+    function addToHistory(domanda, risposta, carte) {
+      const historySection = document.getElementById('history-section');
+      const historyContainer = document.getElementById('history-container');
+      
+      const historyItem = document.createElement('div');
+      historyItem.className = 'history-item';
+      historyItem.innerHTML = `
+        <div class="history-question">❓ ${domanda}</div>
+        <div class="history-answer">${risposta}</div>
+        <div class="history-cards">🃏 Carte: ${carte.join(', ')}</div>
+      `;
+      
+      historyContainer.insertBefore(historyItem, historyContainer.firstChild);
+      historySection.style.display = 'block';
+    }
+
+    async function chiedi() {
+      const domanda = document.getElementById("domanda").value.trim();
+      if (!domanda) return;
+
+      const askBtn = document.getElementById('ask-btn');
+      askBtn.disabled = true;
+      askBtn.textContent = '🔮 Consultando...';
+      
+      hideAllSections();
+      showLoading();
+
+      const messaggi = [
+        {
+          role: "system",
+          content: "Sei un cartomante esperto. Per ogni domanda, estrai 3 carte dai tarocchi, le interpreti e fornisci una risposta basata sul loro significato. Rispondi SEMPRE in formato JSON con questa struttura: {\"carte\": [\"Nome Carta 1\", \"Nome Carta 2\", \"Nome Carta 3\"], \"risposta\": \"La tua interpretazione dettagliata qui\"}"
         }
+      ];
 
-        function consultOracle() {
-            const question = document.querySelector('.question-input').value.trim();
-            if (!question) {
-                alert('Per favore, scrivi una domanda per l\'oracolo.');
-                return;
-            }
+      for (const scambio of storico) {
+        messaggi.push({ role: "user", content: scambio.domanda });
+        messaggi.push({ role: "assistant", content: scambio.rispostaGrezza });
+      }
 
-            // Nascondi la sezione domanda e mostra il loading
-            document.querySelector('.question-section').style.display = 'none';
-            document.querySelector('.loading').style.display = 'block';
+      messaggi.push({ role: "user", content: domanda });
 
-            setTimeout(() => {
-                // Estrai 3 carte casuali
-                const shuffled = [...tarotDeck].sort(() => 0.5 - Math.random());
-                currentReading = shuffled.slice(0, 3);
-
-                // Mostra le carte
-                currentReading.forEach((card, index) => {
-                    document.getElementById(`card-${index}`).textContent = card;
-                });
-
-                // Genera interpretazione
-                generateInterpretation(question);
-
-                // Nascondi loading e mostra la lettura
-                document.querySelector('.loading').style.display = 'none';
-                document.querySelector('.reading-section').style.display = 'block';
-            }, 3000);
-        }
-
-        function flipCard(index) {
-            const card = document.querySelectorAll('.card')[index];
-            card.classList.toggle('flipped');
-        }
-
-        function generateInterpretation(question) {
-            const positions = ['passato', 'presente', 'futuro'];
-            let interpretation = `Riguardo alla tua domanda: "${question}"\n\n`;
-            
-            interpretation += `🌙 **PASSATO** - ${currentReading[0]}\n`;
-            interpretation += `Le radici della tua situazione affondano in ${getCardMeaning(currentReading[0], 'passato')}.\n\n`;
-            
-            interpretation += `⭐ **PRESENTE** - ${currentReading[1]}\n`;
-            interpretation += `Attualmente ti trovi in una fase di ${getCardMeaning(currentReading[1], 'presente')}.\n\n`;
-            
-            interpretation += `🔮 **FUTURO** - ${currentReading[2]}\n`;
-            interpretation += `Il tuo cammino ti porterà verso ${getCardMeaning(currentReading[2], 'futuro')}.\n\n`;
-            
-            interpretation += `**CONSIGLIO DELL'ORACOLO:**\n`;
-            interpretation += generateAdvice(currentReading);
-
-            document.getElementById('interpretation-text').innerHTML = interpretation.replace(/\n/g, '<br>');
-        }
-
-        function getCardMeaning(card, position) {
-            const meanings = {
-                'passato': [
-                    'esperienze che hanno plasmato il tuo presente',
-                    'influenze che continuano a guidare il tuo cammino',
-                    'lezioni apprese che ora ti servono da guida',
-                    'eventi che hanno posto le fondamenta della situazione attuale'
-                ],
-                'presente': [
-                    'energie che stanno influenzando la tua situazione attuale',
-                    'forze che operano nel tuo presente',
-                    'opportunità e sfide che stai affrontando ora',
-                    'elementi chiave della tua situazione attuale'
-                ],
-                'futuro': [
-                    'possibilità che si stanno manifestando',
-                    'potenziali sviluppi del tuo percorso',
-                    'energie che si stanno allineando per il tuo futuro',
-                    'direzioni che il destino sta preparando per te'
-                ]
-            };
-
-            const baseInterpretation = interpretations[card] || 'mistero e trasformazione';
-            const positionMeaning = meanings[position][Math.floor(Math.random() * meanings[position].length)];
-            
-            return `${baseInterpretation}. Questa carta rappresenta ${positionMeaning}`;
-        }
-
-        function generateAdvice(cards) {
-            const advices = [
-                'Ascolta la tua intuizione, le risposte che cerchi sono già dentro di te.',
-                'Il cambiamento è inevitabile, abbraccialo con coraggio e fiducia.',
-                'La pazienza sarà la tua migliore alleata in questo momento.',
-                'Non temere di prendere decisioni coraggiose, l\'universo ti sostiene.',
-                'Concentrati sul presente, è qui che risiede il tuo vero potere.',
-                'Le sfide attuali sono opportunità di crescita mascherata.',
-                'Fidati del processo, anche quando non vedi chiaramente la strada.',
-                'La tua forza interiore è più grande di qualsiasi ostacolo esterno.'
-            ];
-
-            return advices[Math.floor(Math.random() * advices.length)];
-        }
-
-        function speakInterpretation() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.cancel();
-            }
-
-            const text = document.getElementById('interpretation-text').textContent;
-            currentUtterance = new SpeechSynthesisUtterance(text);
-            currentUtterance.lang = 'it-IT';
-            currentUtterance.rate = 0.8;
-            currentUtterance.pitch = 0.9;
-            currentUtterance.volume = 0.8;
-
-            speechSynthesis.speak(currentUtterance);
-        }
-
-        function stopSpeaking() {
-            if (speechSynthesis.speaking) {
-                speechSynthesis.cancel();
-            }
-        }
-
-        function resetReading() {
-            document.querySelector('.reading-section').style.display = 'none';
-            document.querySelector('.question-section').style.display = 'block';
-            document.querySelector('.question-input').value = '';
-            
-            // Reset cards
-            document.querySelectorAll('.card').forEach(card => {
-                card.classList.remove('flipped');
-            });
-            
-            // Stop any ongoing speech
-            stopSpeaking();
-            
-            currentReading = [];
-        }
-
-        // Inizializza la pagina
-        document.addEventListener('DOMContentLoaded', function() {
-            generateStars();
+      try {
+        const res = await fetch(URL, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://tuo-sito.vercel.app",
+            "X-Title": "TarocchiOnline"
+          },
+          body: JSON.stringify({
+            model: "mistral/mistral-7b-instruct",
+            messages: messaggi
+          })
         });
-    </script>
+
+        const data = await res.json();
+        
+        if (!data.choices || !data.choices[0]) {
+          throw new Error('Risposta API non valida');
+        }
+        
+        let rispostaJSON;
+        try {
+          rispostaJSON = JSON.parse(data.choices[0].message.content);
+        } catch (e) {
+          throw new Error('Formato JSON non valido');
+        }
+
+        if (!rispostaJSON.carte || !rispostaJSON.risposta) {
+          throw new Error('Dati mancanti nella risposta');
+        }
+
+        // Mostra le carte con animazione
+        setTimeout(() => {
+          showCards(rispostaJSON.carte);
+        }, 500);
+
+        // Mostra la risposta
+        setTimeout(() => {
+          showResponse(rispostaJSON.risposta);
+        }, 1000);
+
+        // Aggiungi allo storico
+        storico.push({
+          domanda,
+          rispostaGrezza: data.choices[0].message.content
+        });
+
+        addToHistory(domanda, rispostaJSON.risposta, rispostaJSON.carte);
+
+        document.getElementById("domanda").value = "";
+
+      } catch (error) {
+        console.error('Errore:', error);
+        const responseText = document.getElementById('response-text');
+        responseText.innerHTML = `
+          <div style="color: #ff6b6b; text-align: center;">
+            ❌ Si è verificato un errore nella consultazione.<br>
+            Riprova tra qualche istante.
+          </div>
+        `;
+      } finally {
+        askBtn.disabled = false;
+        askBtn.textContent = '🔮 Interroga i Tarocchi';
+      }
+    }
+
+    // Permetti l'invio con Enter (Ctrl+Enter per nuova riga)
+    document.getElementById('domanda').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter' && !e.ctrlKey) {
+        e.preventDefault();
+        chiedi();
+      }
+    });
+
+    // Inizializza le stelle
+    createStars();
+  </script>
 </body>
 </html>
